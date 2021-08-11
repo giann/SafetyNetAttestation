@@ -1,7 +1,7 @@
 <?php
 namespace SafetyNet\Statement\Exception;
 
-use \SafetyNet\Statement\StatementException;
+use SafetyNet\Statement\StatementException;
 
 class InvalidJWSFormat extends StatementException
 {

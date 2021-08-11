@@ -1,7 +1,7 @@
 <?php
 namespace SafetyNet\Verifier\Exception;
 
-use \SafetyNet\Verifier\VerifierException;
+use SafetyNet\Verifier\VerifierException;
 
 class CertificateHostnameError extends VerifierException
 {

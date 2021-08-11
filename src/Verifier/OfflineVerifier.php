@@ -9,6 +9,11 @@ use SafetyNet\Statement\Statement;
 class OfflineVerifier extends Verifier
 {
 
+    /**
+     * @param Statement $statement
+     * @throws CheckSignatureException
+     * @return bool
+     */
     protected function guardSignature(Statement $statement): bool
     {
         $jwsHeaders = $statement->getRawHeaders();
@@ -20,7 +25,7 @@ class OfflineVerifier extends Verifier
 
         [$checkMethod, $algorithm] = JWT::$supported_algs[$statement->getHeader()->getAlgorithm()];
 
-        if ($checkMethod != 'openssl') {
+        if ($checkMethod !== 'openssl') {
             throw new CheckSignatureException('Not supported algorithm function');
         }
 

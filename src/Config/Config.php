@@ -6,12 +6,13 @@ use SafetyNet\Verifier\VerifierType;
 
 class Config
 {
-    const VERIFIER_TYPE = 'verifierType';
-    const VERIFIER_TIMESTAMP_DIFF = 'timestampDiffMS';
-    const VERIFIER_CERTIFICATE_DIGEST_SHA256 = 'apkCertificateDigestSha256';
-    const VERIFIER_PACKAGE_NAME = 'apkPackageName';
-    const VERIFIER_API_KEY = 'apiKey';
-    const VERIFIER_HARDWARE_BACKED = 'hardwareBacked';
+    public const VERIFIER_TYPE = 'verifierType';
+    public const VERIFIER_TIMESTAMP_DIFF = 'timestampDiffMS';
+    public const VERIFIER_CERTIFICATE_DIGEST_SHA256 = 'apkCertificateDigestSha256';
+    public const VERIFIER_PACKAGE_NAME = 'apkPackageName';
+    public const VERIFIER_API_KEY = 'apiKey';
+    public const VERIFIER_HARDWARE_BACKED = 'hardwareBacked';
+    public const VERIFIER_DISCARDS_BASIC_INTEGRITY = 'discardsBasicIntegrity';
 
     private VerifierType $verifierType;
     private int $timestampDiffMS = 10 * 60 * 60 * 1000;
@@ -19,6 +20,7 @@ class Config
     private array $apkPackageName = [];
     private string $apiKey;
     private bool $hardwareBacked = false;
+    private bool $discardsBasicIntegrity = false;
 
     public function __construct(array $configOptions)
     {
@@ -31,6 +33,10 @@ class Config
         }
     }
 
+    /**
+     * @param $configOptions
+     * @throws WrongVerifierType
+     */
     private static function validateOptions($configOptions): void
     {
         if (
@@ -69,6 +75,14 @@ class Config
     public function getHardwareBacked(): bool
     {
         return $this->hardwareBacked;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDiscardsBasicIntegrity(): bool
+    {
+        return $this->discardsBasicIntegrity;
     }
 
 

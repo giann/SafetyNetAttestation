@@ -20,12 +20,17 @@ class Attestation
         $this->verifier = $this->buildVerifier($this->config->getVerifierType());
     }
 
-    public function verity(Nonce $nonce, Statement $attestationStatement): bool
+    /**
+     * @param Nonce $nonce
+     * @param Statement $attestationStatement
+     * @return bool
+     */
+    public function verify(Nonce $nonce, Statement $attestationStatement): bool
     {
         return $this->verifier->verify($nonce, $attestationStatement);
     }
 
-    private function buildVerifier(VerifierType $verifierType): Verifier
+    private function buildVerifier(VerifierType $verifierType): ?Verifier
     {
         if (VerifierType::isONLINE($verifierType)) {
             return new OnlineVerifier($this->config);
@@ -34,5 +39,7 @@ class Attestation
         if (VerifierType::isOFFLINE($verifierType)) {
             return new OfflineVerifier($this->config);
         }
+
+        return null;
     }
 }

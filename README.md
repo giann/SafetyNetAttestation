@@ -43,7 +43,7 @@ try {
 
     $attestation = new Attestation($attestationConfig);
 
-    if ($attestation->verity($nonce, $attestationStatement)) {
+    if ($attestation->verify($nonce, $attestationStatement)) {
         echo 'Verification success!' . PHP_EOL;
     } else {
         echo 'Verification failed!' . PHP_EOL;
@@ -81,7 +81,7 @@ try {
 
     $attestation = new Attestation($attestationConfig);
 
-    if ($attestation->verity($nonce, $attestationStatement)) {
+    if ($attestation->verify($nonce, $attestationStatement)) {
         echo 'Verification success!' . PHP_EOL;
     } else {
         echo 'Verification failed!' . PHP_EOL;

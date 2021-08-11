@@ -31,6 +31,11 @@ class StatementHeader
         return $this->algorithm;
     }
 
+    /**
+     * @param array $headers
+     * @return string
+     * @throws EmptyAlgorithmField
+     */
     private function extractAlgorithm(array $headers): string
     {
         if (empty($headers['alg'])) {
@@ -40,6 +45,14 @@ class StatementHeader
         return $headers['alg'];
     }
 
+    /**
+     * @param array $headers
+     * @return X509
+     * @throws MissingCertificates
+     * @throws CertificateLoadError
+     * @throws CertificateCALoadError
+     * @throws RootCertificateError
+     */
     private function extractCertificateChain(array $headers): X509
     {
         if (empty($headers['x5c'])) {

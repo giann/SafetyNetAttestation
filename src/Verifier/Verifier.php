@@ -42,6 +42,11 @@ abstract class Verifier
         return $this->guardAttestHostname($headers) && $this->guardCertificateChain($headers);
     }
 
+    /**
+     * @param StatementHeader $header
+     * @return bool
+     * @throws CertificateHostnameError
+     */
     private function guardAttestHostname(StatementHeader $header): bool
     {
         $commonNames = $header->getCertificateChain()->getDNProp('CN');
@@ -56,6 +61,11 @@ abstract class Verifier
         return true;
     }
 
+    /**
+     * @param StatementHeader $header
+     * @return bool
+     * @throws CertificateChainError
+     */
     private function guardCertificateChain(StatementHeader $header): bool
     {
         if (!$header->getCertificateChain()->validateSignature()) {
@@ -76,6 +86,12 @@ abstract class Verifier
             && $this->guardHardwareBacked($body);
     }
 
+    /**
+     * @param Nonce $nonce
+     * @param StatementBody $statementBody
+     * @return bool
+     * @throws WrongNonce
+     */
     private function guardNonce(Nonce $nonce, StatementBody $statementBody): bool
     {
         $statementNonce = $statementBody->getNonce();
@@ -87,6 +103,12 @@ abstract class Verifier
         return true;
     }
 
+    /**
+     * @param StatementBody $statementBody
+     * @return bool
+     * @throws ProfileMatchFieldError
+     * @throws BasicIntegrityFieldError
+     */
     private function guardDeviceIsNotRooted(StatementBody $statementBody): bool
     {
         $ctsProfileMatch = $statementBody->getCtsProfileMatch();
@@ -96,13 +118,18 @@ abstract class Verifier
             throw new ProfileMatchFieldError('Device is rooted');
         }
 
-        if (empty($basicIntegrity) || !$basicIntegrity) {
+        if ((empty($basicIntegrity) || !$basicIntegrity) && !$this->config->isDiscardsBasicIntegrity()) {
             throw new BasicIntegrityFieldError('Device can be rooted');
         }
 
         return true;
     }
 
+    /**
+     * @param StatementBody $statementBody
+     * @return bool
+     * @throws TimestampFieldError
+     */
     private function guardTimestamp(StatementBody $statementBody): bool
     {
         $timestampDiff = $this->config->getTimeStampDiffInterval();
@@ -115,6 +142,11 @@ abstract class Verifier
         return true;
     }
 
+    /**
+     * @param StatementBody $statementBody
+     * @return bool
+     * @throws ApkDigestShaError
+     */
     private function guardApkCertificateDigestSha256(StatementBody $statementBody): bool
     {
         $apkCertificateDigestSha256 = $this->config->getApkCertificateDigestSha256();
@@ -138,6 +170,11 @@ abstract class Verifier
         throw new ApkDigestShaError('apkCertificateDigestSha256 is not valid');
     }
 
+    /**
+     * @param StatementBody $statementBody
+     * @throws ApkNameError
+     * @return bool
+     */
     private function guardApkPackageName(StatementBody $statementBody): bool
     {
         $apkPackageName = $this->config->getApkPackageName();

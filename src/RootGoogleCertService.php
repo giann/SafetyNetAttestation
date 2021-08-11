@@ -7,9 +7,13 @@ use SafetyNet\Statement\Exception\RootCertificateError;
 
 class RootGoogleCertService
 {
-    const SAVE_CACHE_FILE_NAME = 'GlobalSign.pem';
-    const CRT_FILE_URL = 'https://pki.goog/gsr2/GSR2.crt';
+    public const SAVE_CACHE_FILE_NAME = 'GlobalSign.pem';
+    public const CRT_FILE_URL = 'https://pki.goog/gsr2/GSR2.crt';
 
+    /**
+     * @return string
+     * @throws RootCertificateError
+     */
     public static function rootCertificate(): string
     {
         $certificate = self::findInLocalCache();
@@ -31,6 +35,10 @@ class RootGoogleCertService
         return $certificate;
     }
 
+    /**
+     * @return string|null
+     * @throws RootCertificateError
+     */
     private static function findInLocalBundle(): ?string
     {
         $localCerts = openssl_get_cert_locations();
@@ -50,7 +58,7 @@ class RootGoogleCertService
             $x509 = new X509();
             $x509->loadX509($rawCert);
             $CN = $x509->getDNProp('CN');
-            if (!empty($CN) && $CN[0] == 'GlobalSign') {
+            if (!empty($CN) && $CN[0] === 'GlobalSign') {
                 self::saveToLocalCache($rawCert);
                 return $rawCert;
             }
@@ -94,6 +102,10 @@ class RootGoogleCertService
         return @file_get_contents(self::getCertCacheFile());
     }
 
+    /**
+     * @return string|null
+     * @throws RootCertificateError
+     */
     private static function getCertificateFromGoogle(): ?string
     {
         $crtFile = @file_get_contents(self::CRT_FILE_URL);

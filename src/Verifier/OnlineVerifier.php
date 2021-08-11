@@ -11,6 +11,12 @@ class OnlineVerifier extends Verifier
     private const GOOGLE_API_ENDPOINT = 'https://www.googleapis.com/androidcheck/v1/attestations/verify';
     private ?array $googleAdiResponse = null;
 
+    /**
+     * @param Statement $statement
+     * @return bool
+     * @throws GoogleRequestError
+     * @throws CheckSignatureException
+     */
     protected function guardSignature(Statement $statement): bool
     {
         if (empty($this->googleAdiResponse)) {

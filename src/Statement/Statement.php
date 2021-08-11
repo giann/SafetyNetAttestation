@@ -2,8 +2,8 @@
 
 namespace SafetyNet\Statement;
 
+use DomainException;
 use Firebase\JWT\JWT;
-use phpseclib\File\X509;
 use SafetyNet\Statement\Exception\InvalidJWSFormat;
 
 class Statement
@@ -42,12 +42,16 @@ class Statement
         return $this->signature;
     }
 
-    public function getBody()
+    public function getBody(): StatementBody
     {
         return $this->body;
     }
 
-    private function extractFromJWS(string $rawStatement)
+    /**
+     * @param string $rawStatement
+     * @throws InvalidJWSFormat
+     */
+    private function extractFromJWS(string $rawStatement): void
     {
         $tokens = explode('.', $this->rawStatement);
         if (count($tokens) !== 3) {
@@ -74,11 +78,16 @@ class Statement
         $this->signature = self::urlSafeB64Decode($cryptoB64);
     }
 
+    /**
+     * @param string $json
+     * @return array
+     * @throws InvalidJWSFormat
+     */
     private static function jsonDecode(string $json): array
     {
         try {
             return (array) JWT::jsonDecode($json);
-        } catch (\DomainException $e) {
+        } catch (DomainException $e) {
             throw new InvalidJWSFormat($e->getMessage());
         }
     }
@@ -88,7 +97,7 @@ class Statement
         return JWT::urlsafeB64Decode($input);
     }
 
-    public function toString()
+    public function toString(): string
     {
         return $this->rawStatement;
     }

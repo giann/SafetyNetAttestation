@@ -39,12 +39,12 @@ class StatementBody
         return $this->nonce;
     }
 
-    public function getCtsProfileMatch()
+    public function getCtsProfileMatch(): bool
     {
         return $this->ctsProfileMatch;
     }
 
-    public function getBasicIntegrity()
+    public function getBasicIntegrity(): bool
     {
         return $this->basicIntegrity;
     }
