@@ -9,9 +9,8 @@
             "email": "denis@gorokhov.su"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-        "myclabs/php-enum": "dev-master",
+        "myclabs/php-enum": "^1.8.3",
         "firebase/php-jwt": "^5.0",
         "phpseclib/phpseclib": "^2.0.4",
         "ext-openssl": "*"
