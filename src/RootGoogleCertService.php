@@ -100,10 +100,7 @@ class RootGoogleCertService
         if (empty($crtFile)) {
             throw new RootCertificateError("Can't load root cert from google");
         }
-        $crtFileContent = chunk_split(base64_encode($crtFile), 64, PHP_EOL);
-
-        self::saveToLocalCache($crtFileContent);
-        return $crtFileContent;
+        return chunk_split(base64_encode($crtFile), 64, PHP_EOL);
     }
 
     private static function validateCertFile(?string $certificate): bool
