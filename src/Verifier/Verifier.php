@@ -158,11 +158,11 @@ abstract class Verifier
 
         $configSha256 = [];
         foreach ($apkCertificateDigestSha256 as $sha256) {
-            $configSha256[] = base64_encode(hex2bin($sha256));
+            $configSha256[] = $sha256;
         }
 
         foreach ($testApkCertificateDigestSha256 as $digestSha) {
-            if (in_array($digestSha, $configSha256)) {
+            if (in_array($digestSha, $configSha256, true)) {
                 return true;
             }
         }
