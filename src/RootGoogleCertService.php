@@ -8,7 +8,7 @@ use SafetyNet\Statement\Exception\RootCertificateError;
 class RootGoogleCertService
 {
     public const SAVE_CACHE_FILE_NAME = 'GlobalSign.pem';
-    public const CRT_FILE_URL = 'https://pki.goog/gsr2/GSR2.crt';
+    public const CRT_FILE_URL = 'https://pki.goog/repo/certs/gsr4.der';
 
     /**
      * @return string
