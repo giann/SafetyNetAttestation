@@ -36,7 +36,7 @@ abstract class Verifier
 
     abstract protected function guardSignature(Statement $statement): bool;
 
-    private function guardHeaders(Statement $statement) : bool
+    private function guardHeaders(Statement $statement): bool
     {
         $headers = $statement->getHeader();
         return $this->guardAttestHostname($headers) && $this->guardCertificateChain($headers);
@@ -75,7 +75,7 @@ abstract class Verifier
         return true;
     }
 
-    private function guardBody(Nonce $nonce, Statement $statement) : bool
+    private function guardBody(Nonce $nonce, Statement $statement): bool
     {
         $body = $statement->getBody();
         return $this->guardNonce($nonce, $body)
@@ -114,11 +114,11 @@ abstract class Verifier
         $ctsProfileMatch = $statementBody->getCtsProfileMatch();
         $basicIntegrity = $statementBody->getBasicIntegrity();
 
-        if (empty($ctsProfileMatch) || !$ctsProfileMatch) {
+        if ((empty($ctsProfileMatch) || !$ctsProfileMatch) && !$this->config->isDiscardsCtsProfileMatch()) {
             throw new ProfileMatchFieldError('Device is rooted');
         }
 
-        if ((empty($basicIntegrity) || !$basicIntegrity) && !$this->config->isDiscardsBasicIntegrity()) {
+        if (empty($basicIntegrity) || !$basicIntegrity) {
             throw new BasicIntegrityFieldError('Device can be rooted');
         }
 
@@ -185,7 +185,7 @@ abstract class Verifier
         }
 
         if (!in_array($testApkPackageName, $apkPackageName)) {
-            throw new ApkNameError('apkPackageName ' . $testApkPackageName. ' not equal ' . join(", ", $apkPackageName));
+            throw new ApkNameError('apkPackageName ' . $testApkPackageName . ' not equal ' . join(", ", $apkPackageName));
         }
 
         return true;
@@ -194,6 +194,6 @@ abstract class Verifier
     private function guardHardwareBacked(StatementBody $statementBody): bool
     {
         return !$this->config->getHardwareBacked()
-            || in_array('HARDWARE_BACKED',explode(',',$statementBody->getEvaluationType()),true)!==false;
+            || in_array('HARDWARE_BACKED', explode(',', $statementBody->getEvaluationType()), true) !== false;
     }
 }

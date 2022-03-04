@@ -1,4 +1,5 @@
 <?php
+
 namespace SafetyNet\Config;
 
 use SafetyNet\Config\Exception\WrongVerifierType;
@@ -12,7 +13,7 @@ class Config
     public const VERIFIER_PACKAGE_NAME = 'apkPackageName';
     public const VERIFIER_API_KEY = 'apiKey';
     public const VERIFIER_HARDWARE_BACKED = 'hardwareBacked';
-    public const VERIFIER_DISCARDS_BASIC_INTEGRITY = 'discardsBasicIntegrity';
+    public const VERIFIER_DISCARDS_CTS_PROFILE_MATCH = 'discardsCtsProfileMatch';
 
     private VerifierType $verifierType;
     private int $timestampDiffMS = 10 * 60 * 60 * 1000;
@@ -20,7 +21,7 @@ class Config
     private array $apkPackageName = [];
     private string $apiKey;
     private bool $hardwareBacked = false;
-    private bool $discardsBasicIntegrity = false;
+    private bool $discardsCtsProfileMatch = false;
 
     public function __construct(array $configOptions)
     {
@@ -80,10 +81,8 @@ class Config
     /**
      * @return bool
      */
-    public function isDiscardsBasicIntegrity(): bool
+    public function isDiscardsCtsProfileMatch(): bool
     {
-        return $this->discardsBasicIntegrity;
+        return $this->discardsCtsProfileMatch;
     }
-
-
 }
