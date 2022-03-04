@@ -14,9 +14,11 @@ class StatementHeader
 {
     private string $algorithm;
     private X509 $certificateChain;
+    private RootGoogleCertService $rootGoogleService;
 
-    public function __construct(array $headers)
+    public function __construct(RootGoogleCertService $rootGoogleService, array $headers)
     {
+        $this->rootGoogleService = $rootGoogleService;
         $this->algorithm = $this->extractAlgorithm($headers);
         $this->certificateChain = $this->extractCertificateChain($headers);
     }
@@ -70,7 +72,7 @@ class StatementHeader
             }
         }
 
-        if ($x509->loadCA(RootGoogleCertService::rootCertificate()) === false) {
+        if ($x509->loadCA($this->rootGoogleService->rootCertificate()) === false) {
             throw new RootCertificateError('Failed to load Root-CA certificate');
         }
 

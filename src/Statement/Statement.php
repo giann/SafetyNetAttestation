@@ -4,6 +4,7 @@ namespace SafetyNet\Statement;
 
 use DomainException;
 use Firebase\JWT\JWT;
+use SafetyNet\RootGoogleCertService;
 use SafetyNet\Statement\Exception\InvalidJWSFormat;
 
 class Statement
@@ -15,9 +16,11 @@ class Statement
     private StatementHeader $header;
     private StatementBody $body;
     private string $signature;
+    private RootGoogleCertService $rootGoogleCertService;
 
-    public function __construct(string $statement)
+    public function __construct(RootGoogleCertService $rootGoogleCertService, string $statement)
     {
+        $this->rootGoogleCertService = $rootGoogleCertService;
         $this->rawStatement = $statement;
         $this->extractFromJWS($this->rawStatement);
     }
@@ -73,7 +76,7 @@ class Statement
         $this->rawBody = $bodyB64;
         $this->rawHeader = $headB64;
         $this->rawSignature = $cryptoB64;
-        $this->header = new StatementHeader($header);
+        $this->header = new StatementHeader($this->rootGoogleCertService, $header);
         $this->body = new StatementBody($body);
         $this->signature = self::urlSafeB64Decode($cryptoB64);
     }

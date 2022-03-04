@@ -14,11 +14,11 @@ class RootGoogleCertService
      * @return string
      * @throws RootCertificateError
      */
-    public static function rootCertificate(): string
+    public function rootCertificate(): string
     {
-        $certificate = self::findInLocalCache();
+        $certificate = $this->findInLocalCache();
 
-        if (!self::validateCertFile($certificate)) {
+        if (!$this->validateCertFile($certificate)) {
             $certificate = null;
         }
 
@@ -27,9 +27,9 @@ class RootGoogleCertService
         }
 
         try {
-            $certificate = self::findInLocalBundle();
+            $certificate = $this->findInLocalBundle();
         } catch (RootCertificateError $exception) {
-            $certificate = self::getCertificateFromGoogle();
+            $certificate = $this->getCertificateFromGoogle();
         }
 
         return $certificate;
@@ -39,7 +39,7 @@ class RootGoogleCertService
      * @return string|null
      * @throws RootCertificateError
      */
-    private static function findInLocalBundle(): ?string
+    private function findInLocalBundle(): ?string
     {
         $localCerts = openssl_get_cert_locations();
 
@@ -60,7 +60,7 @@ class RootGoogleCertService
             $x509->loadX509($rawCert);
             $CN = $x509->getDNProp('CN');
             if (!empty($CN) && $CN[0] === 'GlobalSign') {
-                self::saveToLocalCache($rawCert);
+                $this->saveToLocalCache($rawCert);
                 return $rawCert;
             }
         }
@@ -68,39 +68,51 @@ class RootGoogleCertService
         throw new RootCertificateError('Local certificate bundle is unavailable');
     }
 
-    private static function saveToLocalCache(string $rawCert): void
+    private function saveToLocalCache(string $rawCert): void
     {
-        @file_put_contents(self::getCertCacheFile(), $rawCert);
+        @file_put_contents($this->getCertCacheFile(), $rawCert);
     }
 
-    private static function getCertCacheFile(): string
+    private function getCertCacheFile(): string
     {
         return sys_get_temp_dir() . '/' . self::SAVE_CACHE_FILE_NAME;
     }
 
-    private static function findInLocalCache(): ?string
+    private function findInLocalCache(): ?string
     {
-        if (!is_file(self::getCertCacheFile())) {
+        if (!is_file($this->getCertCacheFile())) {
             return null;
         }
 
-        return @file_get_contents(self::getCertCacheFile());
+        return @file_get_contents($this->getCertCacheFile());
     }
 
     /**
      * @return string|null
      * @throws RootCertificateError
      */
-    private static function getCertificateFromGoogle(): ?string
+    private function getCertificateFromGoogle(): ?string
     {
-        $crtFile = @file_get_contents(self::CRT_FILE_URL);
-        if (empty($crtFile)) {
+        // For some reason, using symfony/http-client does not work
+        $cert = file_get_contents(
+            self::CRT_FILE_URL,
+            false,
+            stream_context_create([
+                'http' => [
+                    'proxy' => preg_replace('/^http/', 'tcp', $_SERVER['HTTPS_PROXY']),
+                    'request_fulluri' => true,
+                ]
+            ])
+        );
+
+        if ($cert === false) {
             throw new RootCertificateError("Can't load root cert from google");
         }
-        return chunk_split(base64_encode($crtFile), 64, PHP_EOL);
+
+        return chunk_split(base64_encode($cert), 64, PHP_EOL);
     }
 
-    private static function validateCertFile(?string $certificate): bool
+    private function validateCertFile(?string $certificate): bool
     {
         if (empty($certificate)) {
             return false;
