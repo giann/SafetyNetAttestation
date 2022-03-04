@@ -7,7 +7,7 @@ use SafetyNet\Statement\Exception\RootCertificateError;
 
 class RootGoogleCertService
 {
-    public const SAVE_CACHE_FILE_NAME = 'GlobalSign.pem';
+    public const SAVE_CACHE_FILE_NAME = 'GoogleGlobalSign.pem';
     public const CRT_FILE_URL = 'https://pki.goog/repo/certs/gsr4.der';
 
     /**
@@ -43,13 +43,14 @@ class RootGoogleCertService
     {
         $localCerts = openssl_get_cert_locations();
 
-        if (empty($localCerts['ini_cafile'])
+        if (
+            empty($localCerts['ini_cafile'])
             || !($caCerts = file_get_contents($localCerts['ini_cafile']))
         ) {
             throw new RootCertificateError('Local certificate bundle is unavailable');
         }
 
-        $rawCerts = explode("-----END CERTIFICATE-----", str_replace("-----BEGIN CERTIFICATE-----","", $caCerts));
+        $rawCerts = explode("-----END CERTIFICATE-----", str_replace("-----BEGIN CERTIFICATE-----", "", $caCerts));
         foreach ($rawCerts as $rawCert) {
             $rawCert = trim($rawCert);
             if (empty($rawCert)) {
@@ -69,28 +70,12 @@ class RootGoogleCertService
 
     private static function saveToLocalCache(string $rawCert): void
     {
-        self::checkTMPDir();
         @file_put_contents(self::getCertCacheFile(), $rawCert);
-    }
-
-    private static function checkTMPDir(): bool
-    {
-        $tmpDir = self::getTMPDir();
-        if (is_dir($tmpDir)) {
-            return true;
-        }
-
-        return mkdir($tmpDir);
-    }
-
-    private static function getTMPDir(): string
-    {
-        return __DIR__ . "/../tmp";
     }
 
     private static function getCertCacheFile(): string
     {
-        return self::getTMPDir() . '/' . self::SAVE_CACHE_FILE_NAME;
+        return sys_get_temp_dir() . '/' . self::SAVE_CACHE_FILE_NAME;
     }
 
     private static function findInLocalCache(): ?string
